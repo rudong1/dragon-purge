@@ -7,6 +7,7 @@ const { pathToFileURL } = require('node:url');
 const { WINDOW_SIZES, normalizePreferences, fitWindow } = require('./lib/preferences.cjs');
 const { windowsShortcutOptions, linuxDesktopEntry } = require('./lib/shortcuts.cjs');
 const { createUpdater } = require('./updater.cjs');
+const { createBehavior } = require('./lib/behavior.cjs');
 
 const rendererPath = path.join(__dirname, 'renderer', 'index.html');
 const rendererUrl = pathToFileURL(rendererPath).href;
@@ -15,6 +16,8 @@ const APP_ID = 'com.rudong1.dragonpet';
 let window;
 let tray;
 let updater;
+let behavior;
+let drag;
 let preferences = normalizePreferences({});
 let preferencesPath;
 let positionTimer;
@@ -47,6 +50,7 @@ function getStatus() {
     version: app.getVersion(),
     platform: process.platform,
     packaged: app.isPackaged,
+    behavior: behavior?.getState() ?? { activity: 'awake', activitySince: Date.now() },
     updater: updater?.getState() ?? { phase: 'disabled', message: '正在初始化更新检查。' }
   };
 }
@@ -79,12 +83,15 @@ function setVisible(visible) {
   if (!window || window.isDestroyed()) return;
   if (visible) { fitCurrentWindow(); window.show(); }
   else { rememberPosition(); window.hide(); }
+  drag = null;
+  behavior?.setVisible(visible);
   broadcast();
 }
 
 function setPose(pose) {
   if (!['standing', 'sitting'].includes(pose)) throw new Error('Unknown pose.');
   preferences.pose = pose;
+  behavior?.reset();
   savePreferences();
   broadcast();
 }
@@ -148,6 +155,14 @@ function buildMenu() {
     { label: '大小', submenu: Object.entries({ small: '小', medium: '中', large: '大' }).map(([size, label]) => ({
       label, type: 'radio', checked: preferences.size === size, click: () => setSize(size)
     })) },
+    { label: '动作', submenu: [
+      { label: '坐着晃腿', click: () => setPose('sitting') },
+      { label: '抱尾巴打个盹', click: () => behavior?.sleep() },
+      { label: '叫醒她', enabled: ['sleeping', 'drowsy'].includes(status.behavior.activity), click: () => behavior?.wake() },
+      { label: '求摸摸', click: () => behavior?.requestPat() },
+      { label: '摸摸头', click: () => behavior?.petHead() },
+      { label: '换装坐姿 · 好看吗？', click: () => behavior?.showcase() }
+    ] },
     { label: '保持置顶', type: 'checkbox', checked: preferences.alwaysOnTop, click: () => performAction('toggle-always-on-top') },
     { label: '开机启动', type: 'checkbox', checked: status.autostart, enabled: app.isPackaged && ['win32', 'darwin'].includes(process.platform), click: () => void performAction('toggle-autostart') },
     { label: '创建桌面快捷方式', click: () => void performAction('create-shortcut').then(result => {
@@ -169,12 +184,40 @@ function buildMenu() {
 
 function showContextMenu() {
   if (!window || window.isDestroyed()) return;
+  behavior?.interact({ preserveActivity: true });
   buildMenu().popup({ window });
+}
+
+function beginDrag() {
+  if (!window || window.isDestroyed()) return;
+  drag = { cursor: screen.getCursorScreenPoint(), bounds: window.getBounds() };
+  behavior?.interact({ preserveActivity: true });
+}
+
+function moveDrag() {
+  if (!drag || !window || window.isDestroyed()) return;
+  const cursor = screen.getCursorScreenPoint();
+  const position = { x: drag.bounds.x + cursor.x - drag.cursor.x, y: drag.bounds.y + cursor.y - drag.cursor.y };
+  const fitted = fitWindow(drag.bounds, position, displayAreas());
+  window.setPosition(fitted.x, fitted.y);
+}
+
+function endDrag() {
+  if (drag) { drag = null; rememberPosition(); behavior?.interact({ preserveActivity: true }); }
 }
 
 async function performAction(action, value) {
   try {
     switch (action) {
+      case 'drag-begin': beginDrag(); break;
+      case 'drag-move': moveDrag(); break;
+      case 'drag-end': endDrag(); break;
+      case 'pet-interact': behavior?.interact(); break;
+      case 'pet-head': behavior?.petHead(); break;
+      case 'sleep': behavior?.sleep(); break;
+      case 'wake': behavior?.wake(); break;
+      case 'request-pat': behavior?.requestPat(); break;
+      case 'showcase': behavior?.showcase(); break;
       case 'show-menu': showContextMenu(); break;
       case 'toggle-visible': setVisible(!window.isVisible()); break;
       case 'set-pose': setPose(value); break;
@@ -229,7 +272,7 @@ function createWindow() {
     clearTimeout(positionTimer);
     positionTimer = setTimeout(rememberPosition, 200);
   });
-  window.once('ready-to-show', () => { window.show(); broadcast(); });
+  window.once('ready-to-show', () => { window.show(); behavior?.setVisible(true); broadcast(); });
   window.on('close', () => { rememberPosition(); });
   window.on('closed', () => { window = null; if (!quitting) exitApp(); });
   void window.loadFile(rendererPath).catch(error => {
@@ -243,13 +286,14 @@ if (!app.requestSingleInstanceLock()) {
 } else {
   app.setAppUserModelId(APP_ID);
   app.on('second-instance', () => { if (window) { setVisible(true); window.focus(); } });
-  app.on('before-quit', () => { quitting = true; clearTimeout(positionTimer); updater?.dispose(); rememberPosition(); });
+  app.on('before-quit', () => { quitting = true; clearTimeout(positionTimer); updater?.dispose(); behavior?.dispose(); drag = null; rememberPosition(); });
   app.on('window-all-closed', () => app.quit());
   app.on('activate', () => { if (window) setVisible(true); });
   app.whenReady().then(async () => {
     preferencesPath = path.join(app.getPath('userData'), 'preferences.json');
     try { preferences = normalizePreferences(JSON.parse(fs.readFileSync(preferencesPath, 'utf8'))); }
     catch { preferences = normalizePreferences({}); }
+    behavior = createBehavior({ onChange: broadcast });
     createWindow();
     updater = createUpdater({ app, dialog, shell, onStatus: broadcast });
     let trayIcon = nativeImage.createFromPath(iconPath);

@@ -9,14 +9,20 @@
 </head>
 <body>
   <main id="pet-stage" aria-label="可以拖动的白龙娘桌宠">
-    <img id="pet" src="../../docs/assets/desktop-pet-sitting.png" alt="坐在地上的白色小龙娘" draggable="false">
+    <div id="pet-surface" tabindex="0" aria-label="拖动可移动；点击头部摸摸，睡着后点击叫醒">
+      <img id="pet" src="../../docs/assets/desktop-pet-sitting.png" alt="坐在地上的白色小龙娘" draggable="false">
+      <canvas id="pet-canvas" aria-hidden="true"></canvas>
+    </div>
     <nav class="tools" aria-label="桌宠控制">
       <button id="pose" type="button" title="切换站姿和坐姿">站起来</button>
+      <button id="pat" type="button" title="摸摸头，看看她的尾巴">摸摸头</button>
       <button id="menu" type="button" title="大小、更新、快捷方式和退出">菜单 ···</button>
     </nav>
     <div id="notice" class="notice" role="status" hidden></div>
+    <div id="speech" class="speech" role="status" hidden></div>
     <button id="install-update" class="install" type="button" hidden>重启更新</button>
   </main>
+  <script src="../../docs/desktop-pet-motion.js"></script>
   <script src="pet.js"></script>
 </body>
 </html>

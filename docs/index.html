@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f7f4ef">
   <meta name="description" content="白色 GPT 小龙娘：全身、透明底、赤脚造型的桌宠预览。">
-  <title>白龙娘 GPT · 坐姿桌宠预览</title>
+  <title>白龙娘 GPT · 动作预览</title>
   <style>
     :root { color-scheme: light; --paper: #f7f4ef; --ink: #253c36; --mint: #c7e7d9; --deep: #25664f; }
     * { box-sizing: border-box; }
@@ -17,9 +17,13 @@
     .status::before { content: ''; width: 7px; height: 7px; background: #5c9c80; border-radius: 50%; }
     .card { display: grid; grid-template-columns: 1.12fr 1fr; overflow: hidden; border: 1px solid #dce6df; border-radius: 28px; background: #ffffff; box-shadow: 0 18px 64px #244c3c0d; }
     .portrait { margin: 0; padding: 20px; display: grid; place-items: center; background: #eef5ef; }
-    .desktop-pet { display: block; width: 100%; height: min(72svh, 730px); object-fit: contain; transform-origin: 50% 90%; animation: idle 6s ease-in-out infinite; }
-    .desktop-pet.paused { animation-play-state: paused; }
-    @keyframes idle { 0%, 100% { transform: translateY(0) scaleY(1); } 50% { transform: translateY(-3px) scaleY(1.004); } }
+    .pet-preview { position: relative; width: 100%; height: min(72svh, 730px); }
+    .desktop-pet, #preview-canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+    #preview-canvas { visibility: hidden; }
+    .motion-ready #preview-canvas { visibility: visible; }
+    .motion-ready .desktop-pet { visibility: hidden; }
+    #pet-bubble { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); max-width: 95%; padding: 10px 14px; border: 1px solid #c7dfcf; border-radius: 15px; background: #ffffffed; color: var(--deep); font-size: 13px; white-space: nowrap; pointer-events: none; }
+    [hidden] { display: none !important; }
     .copy { align-self: center; padding: 44px 36px; }
     .eyebrow { margin: 0 0 16px; font-size: 12px; font-weight: 650; letter-spacing: .18em; color: var(--deep); }
     h1 { margin: 0; font-size: clamp(30px, 4vw, 44px); line-height: 1.25; font-weight: 700; letter-spacing: -.04em; }
@@ -34,55 +38,46 @@
     .hint { margin: 20px 0 0; font-size: 12px; line-height: 1.8; color: #63766c; }
     .hint a { color: var(--deep); text-underline-offset: 3px; }
     footer { font-size: 12px; color: #687c71; line-height: 1.8; }
-    @media (max-width: 700px) { main { padding: 24px 18px; gap: 18px; } .card { grid-template-columns: 1fr; border-radius: 22px; } .portrait { padding: 18px; } .desktop-pet { height: 500px; } .copy { padding: 30px 24px 34px; } h1 { font-size: 34px; } .description { margin-top: 16px; } }
-    @media (prefers-reduced-motion: reduce) { .desktop-pet { animation: none; } #motion-toggle { display: none; } }
+    @media (max-width: 700px) { main { padding: 24px 18px; gap: 18px; } .card { grid-template-columns: 1fr; border-radius: 22px; } .portrait { padding: 18px; } .pet-preview { height: 500px; } .copy { padding: 30px 24px 34px; } h1 { font-size: 34px; } .description { margin-top: 16px; } }
   </style>
 </head>
 <body>
   <main>
     <header>
       <div class="brand">白龙娘 GPT</div>
-      <div class="status">全身桌宠预览</div>
+      <div class="status">动作与换装预览</div>
     </header>
     <section class="card" aria-labelledby="title">
       <figure class="portrait">
-        <img id="desktop-pet" class="desktop-pet" src="assets/desktop-pet-sitting.png" width="1122" height="1402" alt="坐在地上的白色小龙娘，双脚自然向前，脚底可见。">
+        <div id="pet-preview" class="pet-preview" tabindex="0" role="button" aria-label="点击头部摸摸，睡着后点击叫醒">
+          <img id="desktop-pet" class="desktop-pet" src="assets/desktop-pet-sitting.png" width="1122" height="1402" alt="坐着轻轻晃腿的小白龙">
+          <canvas id="preview-canvas" aria-hidden="true"></canvas>
+          <div id="pet-bubble" hidden></div>
+        </div>
       </figure>
       <div class="copy">
         <p class="eyebrow">PEARL WHITE · MINT GREEN</p>
         <h1 id="title">一只小白龙，<span>陪你待机。</span></h1>
-        <p class="description">白发、珍珠龙角，还有薄荷绿的 GPT 头饰。现在可以坐在地上陪你待机，也能切换回站姿。</p>
-        <ul class="features" aria-label="预览信息"><li>站姿 / 坐姿</li><li>透明背景</li><li>Windows 桌宠框架</li></ul>
+        <p class="description">坐着慢慢晃腿，困了就抱着尾巴打盹。点击头部摸摸她，再看看那条停不下来的小尾巴。</p>
+        <ul class="features" aria-label="预览信息"><li>慢节奏连续动作</li><li>点击互动</li><li>换装坐姿</li></ul>
         <div class="actions">
-          <a id="png-download" class="button" href="assets/desktop-pet-sitting.png" download="白龙娘GPT-坐姿桌宠.png">下载透明 PNG</a>
-          <button id="pose-toggle" class="button secondary" type="button">切换站姿</button>
+          <button class="button" data-action="sitting" type="button">坐着晃腿</button>
+          <button class="button secondary" data-action="sleep" type="button">抱尾巴打盹</button>
+          <button class="button secondary" data-action="wake" type="button">叫醒她</button>
+          <button class="button secondary" data-action="ask" type="button">求摸摸</button>
+          <button class="button secondary" data-action="pat" type="button">摸摸头</button>
+          <button class="button secondary" data-action="showcase" type="button">换装坐姿</button>
+          <button class="button secondary" data-action="standing" type="button">站起来</button>
           <button id="motion-toggle" class="button secondary" type="button" aria-pressed="false">暂停待机</button>
         </div>
-        <p class="hint"><a href="https://github.com/rudong1/dragon-purge/releases">下载 Windows 桌宠</a> · <a href="assets/desktop-pet-sitting.png" target="_blank" rel="noopener">单独打开坐姿原图</a></p>
+        <p id="activity-status" class="hint" role="status">坐着晃腿 · 10 秒一轮</p>
+        <p class="hint"><a href="https://github.com/rudong1/dragon-purge/releases/latest">下载 Windows 桌宠</a> · <a id="png-download" href="assets/desktop-pet-sitting.png" download="白龙娘GPT.png">下载当前透明 PNG</a></p>
       </div>
     </section>
     <footer>全身立绘 · 透明底素材 · 薄荷绿 GPT 头饰</footer>
   </main>
-  <script>
-    const toggle = document.getElementById('motion-toggle');
-    const pet = document.getElementById('desktop-pet');
-    const poseToggle = document.getElementById('pose-toggle');
-    const download = document.getElementById('png-download');
-    let sitting = true;
-    poseToggle.addEventListener('click', () => {
-      sitting = !sitting;
-      const path = sitting ? 'assets/desktop-pet-sitting.png' : 'assets/desktop-pet.png';
-      pet.src = path;
-      pet.alt = sitting ? '坐在地上的白色小龙娘，双脚自然向前。' : '全身站姿白色小龙娘。';
-      download.href = path;
-      download.download = sitting ? '白龙娘GPT-坐姿桌宠.png' : '白龙娘GPT-站姿桌宠.png';
-      poseToggle.textContent = sitting ? '切换站姿' : '切换坐姿';
-    });
-    toggle.addEventListener('click', () => {
-      const paused = pet.classList.toggle('paused');
-      toggle.setAttribute('aria-pressed', String(paused));
-      toggle.textContent = paused ? '继续待机' : '暂停待机';
-    });
-  </script>
+  <script src="desktop-pet-behavior.js"></script>
+  <script src="desktop-pet-motion.js"></script>
+  <script src="preview.js"></script>
 </body>
 </html>

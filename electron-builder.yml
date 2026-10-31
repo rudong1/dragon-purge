@@ -9,6 +9,8 @@ files:
   - desktop/**/*
   - '!desktop/test/**'
   - docs/assets/desktop-pet*.png
+  - docs/desktop-pet-motion.js
+  - docs/desktop-pet-behavior.js
   - package.json
 win:
   target:
