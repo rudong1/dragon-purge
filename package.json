@@ -1,7 +1,7 @@
 {
   "name": "dragon-purge-desktop-pet",
   "productName": "白龙娘桌宠",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A white dragon desktop companion with pose switching, desktop shortcuts and GitHub release updates.",
   "private": true,
   "main": "desktop/main.cjs",
@@ -17,7 +17,7 @@
   "scripts": {
     "postinstall": "node node_modules/electron/install.js --no",
     "start": "electron .",
-    "test": "node --test --test-isolation=none desktop/test/*.test.cjs",
+    "test": "node --test --experimental-test-isolation=none desktop/test/*.test.cjs",
     "icons": "node scripts/build-icons.cjs",
     "pack": "npm run icons && electron-builder --dir",
     "dist:win": "npm run icons && electron-builder --win nsis --x64",
