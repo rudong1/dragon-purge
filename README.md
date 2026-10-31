@@ -41,7 +41,7 @@ npm run dist:win
 
 安装器输出在 `release/`。自动更新读取此仓库 GitHub Releases 的公开发布版，不需要用户填写 GitHub Token。
 
-发布新版本时先更新 `package.json` 和 `package-lock.json` 的版本号，再推送匹配的版本标签，例如 `v0.1.1`。`.github/workflows/release.yml` 会在 Windows 上运行锁定依赖安装、测试和 NSIS 构建，上传安装器、blockmap 与 `latest.yml`；更新文件保留 electron-updater 的完整性校验。
+发布新版本时先更新 `package.json` 和 `package-lock.json` 的版本号，再推送匹配的版本标签，例如 `v0.1.2`。`.github/workflows/release.yml` 会在 Windows 上运行锁定依赖安装、测试和 NSIS 构建，上传安装器和 `latest.yml`；若构建生成 blockmap，也会一并上传。首个发行版未提供独立 blockmap，electron-updater 会回退到完整安装包下载，并保留 SHA-512 完整性校验。
 
 应用由 Electron 主进程管理窗口、托盘、快捷方式和更新；渲染进程只通过限定的 IPC 调用桌宠操作，不具备 Node.js 权限。设置保存在应用用户数据目录的 `preferences.json`。目前是桌宠框架与立绘待机效果，尚未接入 GPT 对话、眨眼、口型或完整 Live2D 绑定。
 
