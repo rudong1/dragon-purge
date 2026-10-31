@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self'; style-src 'self'; script-src 'self'; connect-src 'none'; base-uri 'none'; object-src 'none'">
+  <title>白龙娘 GPT</title>
+  <link rel="stylesheet" href="pet.css">
+</head>
+<body>
+  <main id="pet-stage" aria-label="可以拖动的白龙娘桌宠">
+    <img id="pet" src="../../docs/assets/desktop-pet-sitting.png" alt="坐在地上的白色小龙娘" draggable="false">
+    <nav class="tools" aria-label="桌宠控制">
+      <button id="pose" type="button" title="切换站姿和坐姿">站起来</button>
+      <button id="menu" type="button" title="大小、更新、快捷方式和退出">菜单 ···</button>
+    </nav>
+    <div id="notice" class="notice" role="status" hidden></div>
+    <button id="install-update" class="install" type="button" hidden>重启更新</button>
+  </main>
+  <script src="pet.js"></script>
+</body>
+</html>

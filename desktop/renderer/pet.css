@@ -1,0 +1,15 @@
+:root { color-scheme: light; font-family: 'Segoe UI','Microsoft YaHei',sans-serif; color: #254c3d; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; user-select: none; }
+#pet-stage { width: 100%; height: 100%; padding: 24px 6px 10px; display: grid; place-items: center; -webkit-app-region: drag; }
+#pet { width: 100%; height: 100%; min-height: 0; object-fit: contain; pointer-events: none; transform-origin: 50% 90%; animation: breathe 5s ease-in-out infinite; }
+@keyframes breathe { 0%, 100% { transform: translateY(0) scaleY(1); } 50% { transform: translateY(-2px) scaleY(1.004); } }
+button { -webkit-app-region: no-drag; cursor: pointer; border: 1px solid #c4ddcf; border-radius: 10px; background: #f7fffafa; color: #285c48; font: inherit; font-size: 12px; padding: 7px 11px; box-shadow: 0 3px 12px #0b3c2412; }
+button:hover { background: #dff2e6; }
+button:focus-visible { outline: 2px solid #3d8a65; outline-offset: 2px; }
+.tools { position: absolute; top: 4px; right: 5px; display: flex; gap: 5px; opacity: 0; transition: opacity .16s; -webkit-app-region: no-drag; }
+body:hover .tools, .tools:focus-within { opacity: 1; }
+.notice { position: absolute; bottom: 12px; left: 8px; right: 8px; padding: 9px 12px; border: 1px solid #c4ddcf; border-radius: 12px; background: #f7fffaf5; font-size: 12px; line-height: 1.5; box-shadow: 0 4px 16px #0b3c2412; -webkit-app-region: no-drag; pointer-events: none; }
+.install { position: absolute; bottom: 8px; right: 8px; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { #pet { animation: none; } .tools { transition: none; } }

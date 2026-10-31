@@ -1,0 +1,35 @@
+appId: com.rudong1.dragonpet
+productName: 白龙娘GPT
+asar: true
+npmRebuild: false
+directories:
+  output: release
+  buildResources: desktop/assets
+files:
+  - desktop/**/*
+  - '!desktop/test/**'
+  - docs/assets/desktop-pet*.png
+  - package.json
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: desktop/assets/icon.ico
+  executableName: DragonGPT
+  artifactName: DragonGPT-${version}-${arch}-Setup.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowElevation: true
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: 白龙娘GPT
+  uninstallDisplayName: 白龙娘GPT
+  runAfterFinish: true
+publish:
+  provider: github
+  owner: rudong1
+  repo: dragon-purge
+  releaseType: release

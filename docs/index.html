@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f7f4ef">
   <meta name="description" content="白色 GPT 小龙娘：全身、透明底、赤脚造型的桌宠预览。">
-  <title>白龙娘 GPT · 全身桌宠预览</title>
+  <title>白龙娘 GPT · 坐姿桌宠预览</title>
   <style>
     :root { color-scheme: light; --paper: #f7f4ef; --ink: #253c36; --mint: #c7e7d9; --deep: #25664f; }
     * { box-sizing: border-box; }
@@ -46,18 +46,19 @@
     </header>
     <section class="card" aria-labelledby="title">
       <figure class="portrait">
-        <img id="desktop-pet" class="desktop-pet" src="assets/desktop-pet.png" width="1024" height="1536" alt="全身白色小龙娘，带薄荷绿 GPT 头饰，赤脚，双脚完整可见。">
+        <img id="desktop-pet" class="desktop-pet" src="assets/desktop-pet-sitting.png" width="1122" height="1402" alt="坐在地上的白色小龙娘，双脚自然向前，脚底可见。">
       </figure>
       <div class="copy">
         <p class="eyebrow">PEARL WHITE · MINT GREEN</p>
         <h1 id="title">一只小白龙，<span>陪你待机。</span></h1>
-        <p class="description">白发、珍珠龙角，还有薄荷绿的 GPT 头饰。这次是从龙角到双脚都完整保留的全身桌宠造型，轻轻浮动着陪你待机。</p>
-        <ul class="features" aria-label="预览信息"><li>全身立绘</li><li>透明背景</li><li>赤脚造型</li></ul>
+        <p class="description">白发、珍珠龙角，还有薄荷绿的 GPT 头饰。现在可以坐在地上陪你待机，也能切换回站姿。</p>
+        <ul class="features" aria-label="预览信息"><li>站姿 / 坐姿</li><li>透明背景</li><li>Windows 桌宠框架</li></ul>
         <div class="actions">
-          <a class="button" href="assets/desktop-pet.png" download="白龙娘GPT-全身桌宠.png">下载透明 PNG</a>
+          <a id="png-download" class="button" href="assets/desktop-pet-sitting.png" download="白龙娘GPT-坐姿桌宠.png">下载透明 PNG</a>
+          <button id="pose-toggle" class="button secondary" type="button">切换站姿</button>
           <button id="motion-toggle" class="button secondary" type="button" aria-pressed="false">暂停待机</button>
         </div>
-        <p class="hint">也可以<a href="assets/desktop-pet.png" target="_blank" rel="noopener">单独打开全身原图</a>，或<a href="assets/idle.gif" target="_blank" rel="noopener">回看早期半身动效</a>。</p>
+        <p class="hint"><a href="https://github.com/rudong1/dragon-purge/releases">下载 Windows 桌宠</a> · <a href="assets/desktop-pet-sitting.png" target="_blank" rel="noopener">单独打开坐姿原图</a></p>
       </div>
     </section>
     <footer>全身立绘 · 透明底素材 · 薄荷绿 GPT 头饰</footer>
@@ -65,6 +66,18 @@
   <script>
     const toggle = document.getElementById('motion-toggle');
     const pet = document.getElementById('desktop-pet');
+    const poseToggle = document.getElementById('pose-toggle');
+    const download = document.getElementById('png-download');
+    let sitting = true;
+    poseToggle.addEventListener('click', () => {
+      sitting = !sitting;
+      const path = sitting ? 'assets/desktop-pet-sitting.png' : 'assets/desktop-pet.png';
+      pet.src = path;
+      pet.alt = sitting ? '坐在地上的白色小龙娘，双脚自然向前。' : '全身站姿白色小龙娘。';
+      download.href = path;
+      download.download = sitting ? '白龙娘GPT-坐姿桌宠.png' : '白龙娘GPT-站姿桌宠.png';
+      poseToggle.textContent = sitting ? '切换站姿' : '切换坐姿';
+    });
     toggle.addEventListener('click', () => {
       const paused = pet.classList.toggle('paused');
       toggle.setAttribute('aria-pressed', String(paused));
