@@ -4,7 +4,7 @@
 
 ## 安装与使用
 
-前往 [GitHub Releases](https://github.com/rudong1/dragon-purge/releases) 下载 Windows x64 的 `DragonGPT-版本号-x64-Setup.exe` 安装程序。首次版本由仓库的 Windows 发布工作流构建，下载列表以工作流实际产物为准。
+前往 [最新 Windows 安装版](https://github.com/rudong1/dragon-purge/releases/latest)，下载 `DragonGPT-版本号-x64-Setup.exe`。首个可安装版本是 [v0.1.1](https://github.com/rudong1/dragon-purge/releases/tag/v0.1.1)，支持 Windows 10/11 x64。
 
 - 安装时创建桌面快捷方式；安装完成后即可启动桌宠。
 - 拖动人物可以移动桌宠，位置、大小和姿势会保存。
@@ -75,3 +75,7 @@ npm run dist:win
 如需启用 GitHub Pages，在仓库 **Settings → Pages** 中选择 **Deploy from a branch**，分支选择 **main**，目录选择 **/docs**。网站是否上线以 Pages 设置中的部署状态为准。
 
 当前动效是基于立绘的轻量待机效果；尚未加入眨眼、口型或完整 Live2D 绑定。
+
+## 已完成的验证
+
+15 项逻辑测试在 Node.js 22 和 24 上均通过；真实 Electron 图形环境中验证了站坐切换、大小调整、隐藏/显示、置顶、临时目录快捷方式和退出。Windows 安装器由 GitHub Actions 的 Windows 构建机成功生成；目前尚未人工验证真实 Windows 桌面的安装、快捷方式和跨版本升级流程。
