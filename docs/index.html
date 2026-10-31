@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f4ef">
+  <meta name="description" content="白色 GPT 小龙娘：带着薄荷绿 GPT 头饰的六秒循环待机预览。">
+  <title>白龙娘 GPT · 动态预览</title>
+  <style>
+    :root { color-scheme: light; --paper: #f7f4ef; --ink: #253c36; --mint: #c7e7d9; --deep: #25664f; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+    main { width: min(1060px, 100%); min-height: 100svh; margin: 0 auto; padding: 40px 28px; display: flex; flex-direction: column; justify-content: center; gap: 24px; }
+    header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .brand { font-size: 15px; font-weight: 650; letter-spacing: .04em; }
+    .status { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #4a6b60; }
+    .status::before { content: ''; width: 7px; height: 7px; background: #5c9c80; border-radius: 50%; }
+    .card { display: grid; grid-template-columns: 1.12fr 1fr; overflow: hidden; border: 1px solid #dce6df; border-radius: 28px; background: #ffffff; box-shadow: 0 18px 64px #244c3c0d; }
+    .portrait { margin: 0; background: var(--paper); }
+    video { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: contain; }
+    .copy { align-self: center; padding: 44px 36px; }
+    .eyebrow { margin: 0 0 16px; font-size: 12px; font-weight: 650; letter-spacing: .18em; color: var(--deep); }
+    h1 { margin: 0; font-size: clamp(30px, 4vw, 44px); line-height: 1.25; font-weight: 700; letter-spacing: -.04em; }
+    h1 span { display: block; }
+    .description { margin: 22px 0 0; max-width: 24em; font-size: 16px; line-height: 1.9; color: #526b61; }
+    .features { display: flex; flex-wrap: wrap; gap: 8px; margin: 26px 0 32px; padding: 0; list-style: none; }
+    .features li { padding: 7px 11px; border-radius: 20px; background: #edf6f0; font-size: 12px; color: #426b57; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 11px 17px; border: 1px solid var(--deep); border-radius: 12px; background: var(--deep); color: #ffffff; font-size: 14px; font-weight: 600; text-decoration: none; }
+    .button.secondary { background: #ffffff; color: var(--deep); border-color: #c9dcd0; }
+    a:focus-visible { outline: 3px solid #75b99a; outline-offset: 4px; }
+    .hint { margin: 20px 0 0; font-size: 12px; line-height: 1.8; color: #63766c; }
+    .hint a { color: var(--deep); text-underline-offset: 3px; }
+    footer { font-size: 12px; color: #687c71; line-height: 1.8; }
+    @media (max-width: 700px) { main { padding: 24px 18px; gap: 18px; } .card { grid-template-columns: 1fr; border-radius: 22px; } .copy { padding: 30px 24px 34px; } h1 { font-size: 34px; } .description { margin-top: 16px; } }
+    @media (prefers-reduced-motion: reduce) { video { display: none; } .portrait { aspect-ratio: 4 / 5; background: var(--paper) url('assets/preview.png') center / contain no-repeat; } }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="brand">白龙娘 GPT</div>
+      <div class="status">待机预览</div>
+    </header>
+    <section class="card" aria-labelledby="title">
+      <figure class="portrait">
+        <video id="preview" controls autoplay loop muted playsinline preload="metadata" poster="assets/preview.png" aria-label="白龙娘 GPT 六秒循环待机动画">
+          <source src="assets/idle.mp4" type="video/mp4">
+          浏览器暂不支持视频播放，可以通过下方链接查看 GIF 动图。
+        </video>
+      </figure>
+      <div class="copy">
+        <p class="eyebrow">PEARL WHITE · MINT GREEN</p>
+        <h1 id="title">一只小白龙，<span>陪你待机。</span></h1>
+        <p class="description">轻轻呼吸，发梢与龙尾缓缓摆动。薄荷绿的 GPT 头饰和聊天气泡，也在微微发光。</p>
+        <ul class="features" aria-label="预览信息"><li>6 秒循环</li><li>珍珠白 × 薄荷绿</li><li>轻柔待机</li></ul>
+        <div class="actions">
+          <a class="button" href="assets/preview.png" target="_blank" rel="noopener">查看高清原画</a>
+          <a class="button secondary" href="assets/idle.mp4" download="白龙娘GPT-待机.mp4">下载动画</a>
+        </div>
+        <p class="hint">视频没有自动播放时，点一下播放键即可。也可以<a href="assets/idle.gif" target="_blank" rel="noopener">查看 GIF 动图</a>。</p>
+      </div>
+    </section>
+    <footer>白发 · 珍珠龙角 · 薄荷绿 GPT 头饰</footer>
+  </main>
+</body>
+</html>
