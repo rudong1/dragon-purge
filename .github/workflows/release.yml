@@ -34,10 +34,45 @@ jobs:
         run: npm ci
       - name: Run tests
         run: npm test
-      - name: Build installer and publish update files
-        run: npm run dist:win -- --publish always
+      - name: Build complete installer without publishing
+        run: npm run dist:win -- --publish never
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Verify installer and update manifest before upload
+        run: node scripts/release-files.cjs prepare
+      - name: Upload all verified files to a draft, then publish
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $false
+          $tag = $env:GITHUB_REF_NAME
+          $existing = gh release view $tag --json isDraft 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            if (-not ($existing | ConvertFrom-Json).isDraft) {
+              throw 'This release is already public. Bump the version instead of replacing published installers.'
+            }
+          } else {
+            gh release create $tag --verify-tag --draft --title "白龙娘GPT $tag" --notes-file docs/RELEASE-NOTES.md
+            if ($LASTEXITCODE -ne 0) { throw 'Could not create a draft release.' }
+          }
+          $inventory = Get-Content release/release-files.json -Raw | ConvertFrom-Json
+          $assetPaths = @($inventory.assets | ForEach-Object { Join-Path release $_ })
+          gh release upload $tag @assetPaths --clobber
+          if ($LASTEXITCODE -ne 0) { throw 'Release files were not all uploaded.' }
+          $remote = gh release view $tag --json assets | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Could not verify uploaded release files.' }
+          foreach ($name in $inventory.assets) {
+            $asset = @($remote.assets | Where-Object { $_.name -eq $name })
+            $expected = (Get-Item (Join-Path release $name)).Length
+            if ($asset.Count -ne 1 -or $asset[0].size -ne $expected) {
+              throw "Missing or incomplete release asset: $name"
+            }
+          }
+          gh release edit $tag --draft=false --prerelease=false --latest
+          if ($LASTEXITCODE -ne 0) { throw 'Could not publish the complete release.' }
       - name: Retain Windows installer and update metadata
         if: always()
         uses: actions/upload-artifact@v4
