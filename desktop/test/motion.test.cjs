@@ -17,3 +17,21 @@ test('reduced motion disables all displacements, and sleep tail motion stays gen
   assert.deepEqual(displacement(.22,.79,2,{activity:'happy',reducedMotion:true}),{x:0,y:0});
   assert.ok(Math.abs(displacement(.22,.79,2,{activity:'sleeping'}).x)<.0021);
 });
+test('toe taps alternate feet and the tail follows the same four-second beat',()=>{
+  const first={activity:'tapping',elapsed:5},second={activity:'tapping',elapsed:7};
+  const leftA=displacement(.75,.93,10,first),rightA=displacement(.91,.93,10,first);
+  const leftB=displacement(.75,.93,10,second),rightB=displacement(.91,.93,10,second);
+  assert.ok(leftA.y<rightA.y-.012);assert.ok(rightB.y<leftB.y-.012);
+  assert.ok(displacement(.22,.79,10,first).x>.015);
+  assert.ok(displacement(.22,.79,10,second).x<-.015);
+  assert.ok(Math.abs(displacement(.51,.20,10,first).x)<.00001);
+});
+test('tapping starts and finishes gently, repeats its beat, and respects reduced motion',()=>{
+  const a=displacement(.75,.93,10,{activity:'tapping',elapsed:5});
+  const b=displacement(.75,.93,10,{activity:'tapping',elapsed:9});
+  assert.deepEqual(a,b);
+  const end=displacement(.75,.93,10,{activity:'tapping',elapsed:24});
+  const near=displacement(.75,.93,10,{activity:'tapping',elapsed:23.999});
+  assert.ok(Math.abs(end.y-near.y)<1e-7);
+  for(const activity of ['tapping','summer'])assert.deepEqual(displacement(.75,.93,10,{activity,elapsed:5,reducedMotion:true}),{x:0,y:0});
+});

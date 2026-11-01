@@ -40,6 +40,27 @@ test('choosing a pose resets transient actions and their completion callbacks', 
 test('seated outfit posing lasts 22 seconds and returns to normal idle', () => {
   const f = fixture(); f.behavior.showcase(); f.advance(21999); assert.equal(f.behavior.getState().activity,'showcase'); f.advance(1); assert.equal(f.behavior.getState().activity,'awake');
 });
+test('toe tapping lasts 24 seconds and status or quiet changes do not restart the action', () => {
+  const f = fixture(); f.behavior.tapFeet(); const since = f.behavior.getState().activitySince;
+  f.advance(6000); f.behavior.interact({ preserveActivity: true }); f.behavior.setQuietMode(true);
+  assert.equal(f.behavior.getState().activitySince, since);
+  f.advance(TIMING.tappingMs - 6001); assert.equal(f.behavior.getState().activity, 'tapping');
+  f.advance(1); assert.equal(f.behavior.getState().activity, 'awake');
+});
+test('summer outfit display gets its full duration when replacing a tapping action', () => {
+  const f = fixture(); f.behavior.tapFeet(); f.advance(6000); f.behavior.summer();
+  f.advance(TIMING.tappingMs - 6000); assert.equal(f.behavior.getState().activity, 'summer');
+  f.advance(5999); assert.equal(f.behavior.getState().activity, 'summer');
+  f.advance(1); assert.equal(f.behavior.getState().activity, 'awake');
+});
+test('head pats and hiding cancel new actions without stale completion callbacks', () => {
+  for (const method of ['tapFeet', 'summer']) {
+    const f = fixture(); f.behavior[method](); f.advance(3000); f.behavior.petHead();
+    f.advance(24000); assert.equal(f.behavior.getState().activity, 'happy');
+    f.behavior[method](); f.behavior.setVisible(false); f.advance(1000000);
+    assert.equal(f.behavior.getState().activity, 'awake'); assert.equal(f.timers.size, 0);
+  }
+});
 test('quiet companionship suppresses automatic requests while keeping sleep, wake and manual interactions', () => {
   const f = fixture({ quietMode: true });
   f.advance(TIMING.askAfterMs); assert.equal(f.behavior.getState().activity, 'awake');

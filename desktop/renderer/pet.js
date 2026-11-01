@@ -14,9 +14,10 @@ let controls;
 let positionLocked = false;
 const images = {
   sleeping: 'desktop-pet-sleeping.png', drowsy: 'desktop-pet-sleeping.png', waking: 'desktop-pet-waking.png',
-  asking: 'desktop-pet-asking.png', petting: 'desktop-pet-happy.png', happy: 'desktop-pet-happy.png', showcase: 'desktop-pet-showcase.png'
+  asking: 'desktop-pet-asking.png', petting: 'desktop-pet-happy.png', happy: 'desktop-pet-happy.png', showcase: 'desktop-pet-showcase.png',
+  tapping: 'desktop-pet-tapping.png', summer: 'desktop-pet-summer.png'
 };
-const phrases = { drowsy: '有点困了…', sleeping: 'Zzz…', waking: '唔…我醒啦～', asking: '可以摸摸头吗？', petting: '好舒服呀～', happy: '谢谢你，陪我一会儿吧～', showcase: '今天的我好看吗？' };
+const phrases = { drowsy: '有点困了…', sleeping: 'Zzz…', waking: '唔…我醒啦～', asking: '可以摸摸头吗？', petting: '好舒服呀～', happy: '谢谢你，陪我一会儿吧～', showcase: '今天的我好看吗？', tapping: '哒、哒，陪你慢慢来～', summer: '换上夏装，清清爽爽～' };
 function showNotice(message) {
   clearTimeout(noticeTimer); notice.textContent = message; notice.hidden = !message;
   if (message) noticeTimer = setTimeout(() => { notice.hidden = true; }, 6500);

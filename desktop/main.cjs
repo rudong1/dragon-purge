@@ -160,11 +160,13 @@ function buildMenu() {
     })) },
     { label: '动作', submenu: [
       { label: '坐着晃腿', click: () => setPose('sitting') },
+      { label: '脚尖点地 · 尾巴跟着摆', click: () => behavior?.tapFeet() },
       { label: '抱尾巴打个盹', click: () => behavior?.sleep() },
       { label: '叫醒她', enabled: ['sleeping', 'drowsy'].includes(status.behavior.activity), click: () => behavior?.wake() },
       { label: '求摸摸', click: () => behavior?.requestPat() },
       { label: '摸摸头', click: () => behavior?.petHead() },
-      { label: '换装坐姿 · 好看吗？', click: () => behavior?.showcase() }
+      { label: '换装坐姿 · 好看吗？', click: () => behavior?.showcase() },
+      { label: '薄荷夏装 · 坐姿展示', click: () => behavior?.summer() }
     ] },
     { label: '安静陪伴', type: 'checkbox', checked: preferences.quietMode, click: () => void performAction('toggle-quiet-mode') },
     { label: '锁定位置', type: 'checkbox', checked: preferences.lockPosition, click: () => void performAction('toggle-lock-position') },
@@ -223,6 +225,8 @@ async function performAction(action, value) {
       case 'wake': behavior?.wake(); break;
       case 'request-pat': behavior?.requestPat(); break;
       case 'showcase': behavior?.showcase(); break;
+      case 'tap-feet': behavior?.tapFeet(); break;
+      case 'summer': behavior?.summer(); break;
       case 'show-menu': showContextMenu(); break;
       case 'toggle-visible': setVisible(!window.isVisible()); break;
       case 'set-pose': setPose(value); break;

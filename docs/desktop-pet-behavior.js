@@ -1,7 +1,7 @@
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.DragonPetBehavior=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';
 
-const TIMING = Object.freeze({ idleAfterMs: 180000, askAfterMs: 75000, requestMs: 18000, drowsyMs: 7000, wakingMs: 10000, pettingMs: 7000, happyMs: 45000, showcaseMs: 22000 });
+const TIMING = Object.freeze({ idleAfterMs: 180000, askAfterMs: 75000, requestMs: 18000, drowsyMs: 7000, wakingMs: 10000, pettingMs: 7000, happyMs: 45000, showcaseMs: 22000, tappingMs: 24000, summerMs: 24000 });
 
 function createBehavior({ onChange = () => {}, now = Date.now, setTimeout: later = setTimeout, clearTimeout: cancel = clearTimeout, timing = TIMING, quietMode = false } = {}) {
   let activity = 'awake';
@@ -61,6 +61,8 @@ function createBehavior({ onChange = () => {}, now = Date.now, setTimeout: later
     armIdle(); change('asking', timing.requestMs, 'awake');
   }
   function showcase() { if (disposed || !visible) return; armIdle(); change('showcase', timing.showcaseMs, 'awake'); }
+  function tapFeet() { if (disposed || !visible) return; change('tapping', timing.tappingMs, 'awake'); armIdle(); }
+  function summer() { if (disposed || !visible) return; change('summer', timing.summerMs, 'awake'); armIdle(); }
   function reset() { if (disposed) return; clear(); change('awake'); armIdle(); }
   function setVisible(value) {
     if (disposed || visible === Boolean(value)) return;
@@ -72,7 +74,7 @@ function createBehavior({ onChange = () => {}, now = Date.now, setTimeout: later
   }
   function dispose() { clear(); disposed = true; }
   armIdle();
-  return { getState, interact, sleep, wake, petHead, requestPat, showcase, reset, setVisible, setQuietMode, dispose };
+  return { getState, interact, sleep, wake, petHead, requestPat, showcase, tapFeet, summer, reset, setVisible, setQuietMode, dispose };
 }
 
 return { createBehavior, TIMING };

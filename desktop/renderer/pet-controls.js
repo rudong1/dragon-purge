@@ -9,7 +9,7 @@ class DragonPetControls {
     this.tabs.forEach((tab,index)=>{tab.addEventListener('click',()=>this.select(tab.dataset.tab));tab.addEventListener('keydown',event=>{if(['ArrowRight','ArrowLeft'].includes(event.key)){event.preventDefault();const next=this.tabs[(index+(event.key==='ArrowRight'?1:-1)+this.tabs.length)%this.tabs.length];this.select(next.dataset.tab);next.focus();}});});
     this.dialog.querySelectorAll('[data-action]').forEach(button=>button.addEventListener('click',async()=>{
       const actionName=button.dataset.action;
-      if(['set-pose','sleep','wake','request-pat','pet-head','showcase','toggle-visible','quit'].includes(actionName))this.close();
+      if(['set-pose','sleep','wake','request-pat','pet-head','showcase','tap-feet','summer','toggle-visible','quit'].includes(actionName))this.close();
       const result=await this.action(actionName,button.dataset.value);
       if(result?.message){this.feedback.textContent=result.message;this.feedback.hidden=false;}
     }));
@@ -51,7 +51,7 @@ class DragonPetControls {
     for(const button of this.dialog.querySelectorAll('[data-action="set-pose"]'))button.setAttribute('aria-pressed',String(button.dataset.value===status.pose));
     const activity=status.behavior?.activity||'awake';
     this.dialog.querySelector('[data-action="wake"]').disabled=!['sleeping','drowsy'].includes(activity);
-    document.getElementById('menu-mood').textContent=({sleeping:'正抱着尾巴睡觉呢',drowsy:'有一点困了…',waking:'揉揉眼睛，慢慢醒来',asking:'等一个温柔的摸摸',petting:'摸摸头，好舒服呀',happy:'小尾巴藏不住开心',showcase:'换件衣服给你看看'})[activity]||(status.quietMode?'安静陪着你，随时可以互动':'陪你待机，也陪你玩');
+    document.getElementById('menu-mood').textContent=({sleeping:'正抱着尾巴睡觉呢',drowsy:'有一点困了…',waking:'揉揉眼睛，慢慢醒来',asking:'等一个温柔的摸摸',petting:'摸摸头，好舒服呀',happy:'小尾巴藏不住开心',showcase:'换件衣服给你看看',tapping:'脚尖轻点，尾巴跟着摆',summer:'换上薄荷夏装陪着你'})[activity]||(status.quietMode?'安静陪着你，随时可以互动':'陪你待机，也陪你玩');
   }
 }
 window.DragonPetControls=DragonPetControls;

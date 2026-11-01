@@ -4,9 +4,10 @@
   else root.DragonPetMotion = api.DragonPetMotion;
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
-  const MODES = Object.freeze({ awake: 0, drowsy: 1, sleeping: 2, waking: 3, asking: 4, petting: 5, happy: 6, showcase: 7 });
+  const MODES = Object.freeze({ awake: 0, drowsy: 1, sleeping: 2, waking: 3, asking: 4, petting: 5, happy: 6, showcase: 7, tapping: 8, summer: 9 });
   const TRANSITION_MS = 1400;
   const gaussian = (x, y, cx, cy, rx, ry) => Math.exp(-2 * (((x-cx)/rx)**2 + ((y-cy)/ry)**2));
+  const smooth = value => { const v = Math.max(0, Math.min(1, value)); return v*v*(3-2*v); };
   function displacement(x, y, t, mode = {}) {
     if (mode.reducedMotion) return { x: 0, y: 0 };
     const a = mode.activity || 'awake', tau = 2*Math.PI;
@@ -19,7 +20,16 @@
     }
     const tail = gaussian(x,y,.22,.79,.30,.22);
     let wave = Math.sin(tau*t/12), strength = .010;
-    if (a === 'happy' || a === 'petting') {
+    if (a === 'tapping') {
+      const age = mode.elapsed ?? t;
+      const envelope = smooth(age/1.2)*smooth((24-age)/1.2);
+      const beat = Math.sin(tau*age/4);
+      const left = Math.max(0,beat)**2*gaussian(x,y,.75,.93,.10,.09);
+      const right = Math.max(0,-beat)**2*gaussian(x,y,.91,.93,.10,.09);
+      dx += .003*(left-right)*envelope;
+      dy -= .018*(left+right)*envelope;
+      wave = beat; strength = .016*envelope;
+    } else if (a === 'happy' || a === 'petting') {
       const elapsed = mode.elapsed || 0;
       const envelope = a === 'petting' ? Math.min(1,elapsed/3) : Math.min(1,Math.max(0,(45-elapsed)/5));
       wave = Math.sin(tau*t/2.8); strength = .010+.016*envelope;
@@ -43,7 +53,14 @@
       }
       float tail=region(p,vec2(.22,.79),vec2(.30,.22));
       float wave=sin(TAU*time/12.), strength=.010;
-      if(action>4.5&&action<6.5){
+      if(action>7.5&&action<8.5){
+        float envelope=smoothstep(0.,1.2,age)*(1.-smoothstep(22.8,24.,age));
+        float beat=sin(TAU*age/4.);
+        float left=pow(max(0.,beat),2.)*region(p,vec2(.75,.93),vec2(.10,.09));
+        float right=pow(max(0.,-beat),2.)*region(p,vec2(.91,.93),vec2(.10,.09));
+        d+=vec2(.003*(left-right),-.018*(left+right))*envelope;
+        wave=beat;strength=.016*envelope;
+      }else if(action>4.5&&action<6.5){
         float envelope=action<5.5?min(1.,age/3.):clamp((45.-age)/5.,0.,1.);
         wave=sin(TAU*time/2.8);strength=.010+.016*envelope;
       }else if(action>.5&&action<2.5){wave=sin(TAU*time/9.);strength=.002;}

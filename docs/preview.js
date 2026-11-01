@@ -6,9 +6,9 @@ const download = document.getElementById('png-download');
 const status = document.getElementById('activity-status');
 const toggle = document.getElementById('motion-toggle');
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-const phrases = { drowsy:'有点困了…',sleeping:'Zzz…',waking:'唔…我醒啦～',asking:'可以摸摸头吗？',petting:'好舒服呀～',happy:'谢谢你，陪我一会儿吧～',showcase:'今天的我好看吗？' };
-const names = {awake:'坐着晃腿 · 10 秒一轮',drowsy:'慢慢入睡 · 7 秒',sleeping:'抱尾巴打盹 · 点击叫醒',waking:'揉揉眼睛 · 10 秒',asking:'等待摸摸 · 18 秒',petting:'享受摸摸 · 7 秒',happy:'小尾巴持续轻拍 · 45 秒',showcase:'换装坐姿 · 22 秒'};
-const files = {drowsy:'sleeping',sleeping:'sleeping',waking:'waking',asking:'asking',petting:'happy',happy:'happy',showcase:'showcase'};
+const phrases = { drowsy:'有点困了…',sleeping:'Zzz…',waking:'唔…我醒啦～',asking:'可以摸摸头吗？',petting:'好舒服呀～',happy:'谢谢你，陪我一会儿吧～',showcase:'今天的我好看吗？',tapping:'哒、哒，陪你慢慢来～',summer:'换上夏装，清清爽爽～' };
+const names = {awake:'坐着晃腿 · 10 秒一轮',drowsy:'慢慢入睡 · 7 秒',sleeping:'抱尾巴打盹 · 点击叫醒',waking:'揉揉眼睛 · 10 秒',asking:'等待摸摸 · 18 秒',petting:'享受摸摸 · 7 秒',happy:'小尾巴持续轻拍 · 45 秒',showcase:'换装坐姿 · 22 秒',tapping:'脚尖交替点地 · 尾巴跟拍 · 24 秒',summer:'薄荷夏装 · 坐姿展示 · 24 秒'};
+const files = {drowsy:'sleeping',sleeping:'sleeping',waking:'waking',asking:'asking',petting:'happy',happy:'happy',showcase:'showcase',tapping:'tapping',summer:'summer'};
 let pose='sitting',state={activity:'awake',activitySince:Date.now()},sequence=0,paused=false,motion;
 try { motion=new DragonPetMotion(document.getElementById('preview-canvas'),{onError:()=>preview.classList.remove('motion-ready')}); motion.start(); window.previewMotion=motion; } catch {}
 async function render(next) {
@@ -27,6 +27,8 @@ document.querySelectorAll('[data-action]').forEach(button=>button.addEventListen
     case 'ask':behavior.requestPat();break;
     case 'pat':behavior.petHead();break;
     case 'showcase':behavior.showcase();break;
+    case 'tap-feet':behavior.tapFeet();break;
+    case 'summer':behavior.summer();break;
   }
 }));
 function tap(event){if(['sleeping','drowsy','waking'].includes(state.activity)){behavior.wake();return;}const p=motion?.imagePoint(event.clientX,event.clientY);if(p&&p.x>.20&&p.x<.80&&p.y>.03&&p.y<.42)behavior.petHead();else behavior.interact();}
