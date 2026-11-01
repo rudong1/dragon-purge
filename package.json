@@ -1,7 +1,7 @@
 {
   "name": "dragon-purge-desktop-pet",
   "productName": "白龙娘桌宠",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "A white dragon desktop companion with pose switching, desktop shortcuts and GitHub release updates.",
   "private": true,
   "main": "desktop/main.cjs",

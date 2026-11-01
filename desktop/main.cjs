@@ -45,6 +45,8 @@ function getStatus() {
     pose: preferences.pose,
     size: preferences.size,
     alwaysOnTop: preferences.alwaysOnTop,
+    quietMode: preferences.quietMode,
+    lockPosition: preferences.lockPosition,
     autostart: autostartEnabled(),
     visible: !!window && !window.isDestroyed() && window.isVisible(),
     version: app.getVersion(),
@@ -148,6 +150,7 @@ function buildMenu() {
     { label: `白龙娘 GPT v${app.getVersion()}`, enabled: false },
     { type: 'separator' },
     { label: status.visible ? '隐藏桌宠' : '显示桌宠', click: () => setVisible(!status.visible) },
+    { label: '找回桌宠 · 回到主屏幕', click: () => void performAction('reset-position') },
     { label: '姿势', submenu: [
       { label: '全身站姿', type: 'radio', checked: preferences.pose === 'standing', click: () => setPose('standing') },
       { label: '坐在地上', type: 'radio', checked: preferences.pose === 'sitting', click: () => setPose('sitting') }
@@ -163,6 +166,8 @@ function buildMenu() {
       { label: '摸摸头', click: () => behavior?.petHead() },
       { label: '换装坐姿 · 好看吗？', click: () => behavior?.showcase() }
     ] },
+    { label: '安静陪伴', type: 'checkbox', checked: preferences.quietMode, click: () => void performAction('toggle-quiet-mode') },
+    { label: '锁定位置', type: 'checkbox', checked: preferences.lockPosition, click: () => void performAction('toggle-lock-position') },
     { label: '保持置顶', type: 'checkbox', checked: preferences.alwaysOnTop, click: () => performAction('toggle-always-on-top') },
     { label: '开机启动', type: 'checkbox', checked: status.autostart, enabled: app.isPackaged && ['win32', 'darwin'].includes(process.platform), click: () => void performAction('toggle-autostart') },
     { label: '创建桌面快捷方式', click: () => void performAction('create-shortcut').then(result => {
@@ -190,12 +195,12 @@ function showContextMenu() {
 
 function beginDrag() {
   if (!window || window.isDestroyed()) return;
-  drag = { cursor: screen.getCursorScreenPoint(), bounds: window.getBounds() };
   behavior?.interact({ preserveActivity: true });
+  if (!preferences.lockPosition) drag = { cursor: screen.getCursorScreenPoint(), bounds: window.getBounds() };
 }
 
 function moveDrag() {
-  if (!drag || !window || window.isDestroyed()) return;
+  if (!drag || preferences.lockPosition || !window || window.isDestroyed()) return;
   const cursor = screen.getCursorScreenPoint();
   const position = { x: drag.bounds.x + cursor.x - drag.cursor.x, y: drag.bounds.y + cursor.y - drag.cursor.y };
   const fitted = fitWindow(drag.bounds, position, displayAreas());
@@ -222,6 +227,22 @@ async function performAction(action, value) {
       case 'toggle-visible': setVisible(!window.isVisible()); break;
       case 'set-pose': setPose(value); break;
       case 'set-size': setSize(value); break;
+      case 'toggle-quiet-mode':
+        preferences.quietMode = !preferences.quietMode;
+        behavior?.setQuietMode(preferences.quietMode);
+        savePreferences(); broadcast();
+        return { ok: true, message: preferences.quietMode ? '安静陪伴已开启，仍可点击互动。' : '安静陪伴已关闭。' };
+      case 'toggle-lock-position':
+        endDrag();
+        preferences.lockPosition = !preferences.lockPosition;
+        savePreferences(); broadcast();
+        return { ok: true, message: preferences.lockPosition ? '位置已锁定，仍可摸头和右键操作。' : '位置已解锁，可以拖动了。' };
+      case 'reset-position':
+        endDrag();
+        preferences.position = null;
+        setVisible(true);
+        window.focus();
+        return { ok: true, message: '已回到主屏幕右下角。' };
       case 'toggle-always-on-top':
         preferences.alwaysOnTop = !preferences.alwaysOnTop;
         window.setAlwaysOnTop(preferences.alwaysOnTop, 'floating');
@@ -293,7 +314,7 @@ if (!app.requestSingleInstanceLock()) {
     preferencesPath = path.join(app.getPath('userData'), 'preferences.json');
     try { preferences = normalizePreferences(JSON.parse(fs.readFileSync(preferencesPath, 'utf8'))); }
     catch { preferences = normalizePreferences({}); }
-    behavior = createBehavior({ onChange: broadcast });
+    behavior = createBehavior({ onChange: broadcast, quietMode: preferences.quietMode });
     createWindow();
     updater = createUpdater({ app, dialog, shell, onStatus: broadcast });
     let trayIcon = nativeImage.createFromPath(iconPath);

@@ -3,15 +3,16 @@
 
 const TIMING = Object.freeze({ idleAfterMs: 180000, askAfterMs: 75000, requestMs: 18000, drowsyMs: 7000, wakingMs: 10000, pettingMs: 7000, happyMs: 45000, showcaseMs: 22000 });
 
-function createBehavior({ onChange = () => {}, now = Date.now, setTimeout: later = setTimeout, clearTimeout: cancel = clearTimeout, timing = TIMING } = {}) {
+function createBehavior({ onChange = () => {}, now = Date.now, setTimeout: later = setTimeout, clearTimeout: cancel = clearTimeout, timing = TIMING, quietMode = false } = {}) {
   let activity = 'awake';
   let activitySince = now();
   let visible = true;
   let disposed = false;
+  let quiet = quietMode === true;
   let idleTimer, askTimer, phaseTimer;
   const clear = () => { for (const t of [idleTimer, askTimer, phaseTimer]) if (t !== undefined) cancel(t); idleTimer = askTimer = phaseTimer = undefined; };
   const schedule = (fn, delay) => { const id = later(fn, delay); id?.unref?.(); return id; };
-  function getState() { return { activity, activitySince, ...timing }; }
+  function getState() { return { activity, activitySince, quietMode: quiet, ...timing }; }
   function change(next, duration, after) {
     if (disposed) return;
     if (phaseTimer !== undefined) cancel(phaseTimer);
@@ -19,15 +20,20 @@ function createBehavior({ onChange = () => {}, now = Date.now, setTimeout: later
     activity = next; activitySince = now(); onChange(getState());
     if (visible && duration) phaseTimer = schedule(() => change(after), duration);
   }
-  function armIdle() {
-    if (idleTimer !== undefined) cancel(idleTimer);
+  function armAsk() {
     if (askTimer !== undefined) cancel(askTimer);
-    idleTimer = askTimer = undefined;
-    if (!visible || disposed) return;
-    idleTimer = schedule(sleep, timing.idleAfterMs);
+    askTimer = undefined;
+    if (quiet || !visible || disposed || ['sleeping', 'drowsy'].includes(activity)) return;
     askTimer = schedule(() => {
       if (activity === 'awake') change('asking', timing.requestMs, 'awake');
     }, timing.askAfterMs);
+  }
+  function armIdle() {
+    if (idleTimer !== undefined) cancel(idleTimer);
+    idleTimer = undefined;
+    armAsk();
+    if (!visible || disposed) return;
+    idleTimer = schedule(sleep, timing.idleAfterMs);
   }
   function sleep() {
     if (disposed || !visible || ['sleeping', 'drowsy'].includes(activity)) return;
@@ -60,9 +66,13 @@ function createBehavior({ onChange = () => {}, now = Date.now, setTimeout: later
     if (disposed || visible === Boolean(value)) return;
     visible = Boolean(value); clear(); change('awake'); if (visible) armIdle();
   }
+  function setQuietMode(value) {
+    if (disposed || quiet === Boolean(value)) return;
+    quiet = Boolean(value); armAsk(); onChange(getState());
+  }
   function dispose() { clear(); disposed = true; }
   armIdle();
-  return { getState, interact, sleep, wake, petHead, requestPat, showcase, reset, setVisible, dispose };
+  return { getState, interact, sleep, wake, petHead, requestPat, showcase, reset, setVisible, setQuietMode, dispose };
 }
 
 return { createBehavior, TIMING };

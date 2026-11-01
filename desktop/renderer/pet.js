@@ -11,6 +11,7 @@ const media = matchMedia('(prefers-reduced-motion: reduce)');
 let currentPose = 'sitting', activity = 'awake', currentKey = '', renderRequest = 0, noticeTimer, lastUpdate = '', down = null, dragFrame;
 let motion;
 let controls;
+let positionLocked = false;
 const images = {
   sleeping: 'desktop-pet-sleeping.png', drowsy: 'desktop-pet-sleeping.png', waking: 'desktop-pet-waking.png',
   asking: 'desktop-pet-asking.png', petting: 'desktop-pet-happy.png', happy: 'desktop-pet-happy.png', showcase: 'desktop-pet-showcase.png'
@@ -30,6 +31,13 @@ async function applyStatus(status) {
   currentPose = status.pose === 'standing' ? 'standing' : 'sitting';
   const behavior = status.behavior || { activity: 'awake', activitySince: Date.now() };
   activity = Object.hasOwn(phrases, behavior.activity) ? behavior.activity : 'awake';
+  positionLocked = status.lockPosition === true;
+  document.body.classList.toggle('position-locked', positionLocked);
+  if (positionLocked) surface.classList.remove('dragging');
+  document.getElementById('pet-stage').setAttribute('aria-label', positionLocked ? '位置已锁定的白龙娘桌宠' : '可以拖动的白龙娘桌宠');
+  surface.setAttribute('aria-label', `${positionLocked ? '位置已锁定' : '拖动可移动'}；点击头部摸摸，睡着后点击叫醒，右键打开菜单`);
+  speech.textContent = phrases[activity] || '';
+  speech.hidden = status.quietMode === true || !phrases[activity];
   const file = images[activity] || (currentPose === 'sitting' ? 'desktop-pet-sitting.png' : 'desktop-pet.png');
   poseButton.textContent = currentPose === 'sitting' ? '站起来' : '坐下来';
   install.hidden = status.updater?.phase !== 'downloaded';
@@ -42,7 +50,6 @@ async function applyStatus(status) {
   const request = ++renderRequest;
   pet.src = `../../docs/assets/${file}`;
   pet.alt = activity === 'awake' ? (currentPose === 'sitting' ? '坐着晃腿的小白龙' : '站姿小白龙') : phrases[activity];
-  speech.textContent = phrases[activity] || ''; speech.hidden = !phrases[activity];
   document.body.dataset.activity = activity;
   if (motion) {
     try {
@@ -78,7 +85,7 @@ surface.addEventListener('pointerdown', event => {
 surface.addEventListener('pointermove', event => {
   if (!down || event.pointerId !== down.id) return;
   if (Math.hypot(event.screenX-down.x,event.screenY-down.y) > 6) down.moved = true;
-  if (!down.moved) return;
+  if (!down.moved || positionLocked) return;
   surface.classList.add('dragging');
   cancelAnimationFrame(dragFrame); dragFrame=requestAnimationFrame(()=>{if(down)void action('drag-move');});
 });

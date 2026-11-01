@@ -17,6 +17,23 @@ test('new installs use sitting pose while an existing standing preference surviv
   assert.equal(normalizePreferences({ pose: 'standing' }).pose, 'standing');
 });
 
+test('quiet and position lock are opt-in and survive saved preferences with strict booleans', () => {
+  for (const input of [undefined, {}, { quietMode: 'false', lockPosition: 'true' }, { quietMode: 1, lockPosition: [] }]) {
+    const value = normalizePreferences(input);
+    assert.equal(value.quietMode, false); assert.equal(value.lockPosition, false);
+  }
+  const saved = JSON.parse(JSON.stringify(normalizePreferences({ quietMode: true, lockPosition: true })));
+  assert.equal(normalizePreferences(saved).quietMode, true);
+  assert.equal(normalizePreferences(saved).lockPosition, true);
+});
+
+test('clearing a saved position recovers the pet to the primary work area with a visible margin', () => {
+  const primary = { x: 100, y: 50, width: 1280, height: 720 };
+  const secondary = { x: -1920, y: 0, width: 1920, height: 1080 };
+  const bounds = fitWindow(WINDOW_SIZES.medium, null, [primary, secondary]);
+  assert.deepEqual(bounds, { x: 1056, y: 266, width: 300, height: 480 });
+});
+
 test('restored pet remains visible after its monitor is disconnected', () => {
   const area = { x: 0, y: 0, width: 1280, height: 720 };
   const bounds = fitWindow(WINDOW_SIZES.large, { x: 2900, y: 1700 }, [area]);

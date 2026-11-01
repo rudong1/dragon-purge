@@ -15,6 +15,8 @@ function normalizePreferences(input) {
     pose: value.pose === 'standing' ? 'standing' : 'sitting',
     size: typeof value.size === 'string' && Object.hasOwn(WINDOW_SIZES, value.size) ? value.size : 'medium',
     alwaysOnTop: value.alwaysOnTop !== false,
+    quietMode: value.quietMode === true,
+    lockPosition: value.lockPosition === true,
     position,
     shortcutCreated: value.shortcutCreated === true
   };

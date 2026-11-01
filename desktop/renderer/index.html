@@ -47,6 +47,9 @@
           <section id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" hidden>
             <p class="group-label">桌宠大小</p>
             <div class="size-options" aria-label="桌宠大小"><button data-action="set-size" data-value="small">小</button><button data-action="set-size" data-value="medium">中</button><button data-action="set-size" data-value="large">大</button></div>
+            <button id="setting-quiet" class="switch-row" data-action="toggle-quiet-mode" role="switch" aria-checked="false"><span>安静陪伴<small>隐藏台词，暂停主动求摸摸</small></span><i aria-hidden="true"></i></button>
+            <button id="setting-lock" class="switch-row" data-action="toggle-lock-position" role="switch" aria-checked="false"><span>锁定位置<small>仍可点击摸头和右键操作</small></span><i aria-hidden="true"></i></button>
+            <button class="menu-row" data-action="reset-position" title="移回主屏幕右下角，即使锁定也能找回">找回桌宠 <span aria-hidden="true">⌖</span></button>
             <button id="setting-top" class="switch-row" data-action="toggle-always-on-top" role="switch" aria-checked="true"><span>留在最上面</span><i aria-hidden="true"></i></button>
             <button id="setting-startup" class="switch-row" data-action="toggle-autostart" role="switch" aria-checked="false"><span>开机来找你</span><i aria-hidden="true"></i></button>
             <button class="menu-row" data-action="create-shortcut">创建桌面快捷方式 <span aria-hidden="true">↗</span></button>

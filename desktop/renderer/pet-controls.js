@@ -43,13 +43,15 @@ class DragonPetControls {
     document.getElementById('panel-install').hidden=phase!=='downloaded';
     document.getElementById('check-update').disabled=!u.enabled||['checking','available','downloading','downloaded'].includes(phase);
     document.getElementById('setting-top').setAttribute('aria-checked',String(status.alwaysOnTop));
+    document.getElementById('setting-quiet').setAttribute('aria-checked',String(status.quietMode===true));
+    document.getElementById('setting-lock').setAttribute('aria-checked',String(status.lockPosition===true));
     document.getElementById('setting-startup').setAttribute('aria-checked',String(status.autostart));
     document.getElementById('setting-startup').disabled=!status.packaged||!['win32','darwin'].includes(status.platform);
     for(const button of this.dialog.querySelectorAll('[data-action="set-size"]'))button.setAttribute('aria-pressed',String(button.dataset.value===status.size));
     for(const button of this.dialog.querySelectorAll('[data-action="set-pose"]'))button.setAttribute('aria-pressed',String(button.dataset.value===status.pose));
     const activity=status.behavior?.activity||'awake';
     this.dialog.querySelector('[data-action="wake"]').disabled=!['sleeping','drowsy'].includes(activity);
-    document.getElementById('menu-mood').textContent=({sleeping:'正抱着尾巴睡觉呢',drowsy:'有一点困了…',waking:'揉揉眼睛，慢慢醒来',asking:'等一个温柔的摸摸',petting:'摸摸头，好舒服呀',happy:'小尾巴藏不住开心',showcase:'换件衣服给你看看'})[activity]||'陪你待机，也陪你玩';
+    document.getElementById('menu-mood').textContent=({sleeping:'正抱着尾巴睡觉呢',drowsy:'有一点困了…',waking:'揉揉眼睛，慢慢醒来',asking:'等一个温柔的摸摸',petting:'摸摸头，好舒服呀',happy:'小尾巴藏不住开心',showcase:'换件衣服给你看看'})[activity]||(status.quietMode?'安静陪着你，随时可以互动':'陪你待机，也陪你玩');
   }
 }
 window.DragonPetControls=DragonPetControls;

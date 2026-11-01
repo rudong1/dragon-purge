@@ -2,9 +2,9 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { createBehavior, TIMING } = require('../lib/behavior.cjs');
-function fixture() {
+function fixture(options = {}) {
   let now = 0, serial = 0; const timers = new Map(), changes = [];
-  const behavior = createBehavior({ now: () => now, onChange: s => changes.push(s), setTimeout: (fn, ms) => { const id = ++serial; timers.set(id, {fn, at: now + ms}); return id; }, clearTimeout: id => timers.delete(id) });
+  const behavior = createBehavior({ ...options, now: () => now, onChange: s => changes.push(s), setTimeout: (fn, ms) => { const id = ++serial; timers.set(id, {fn, at: now + ms}); return id; }, clearTimeout: id => timers.delete(id) });
   function advance(ms) { const end = now + ms; for (;;) { const next = [...timers].filter(([,t]) => t.at <= end).sort((a,b) => a[1].at - b[1].at)[0]; if (!next) break; now = next[1].at; timers.delete(next[0]); next[1].fn(); } now = end; }
   return { behavior, advance, changes, timers };
 }
@@ -39,4 +39,32 @@ test('choosing a pose resets transient actions and their completion callbacks', 
 });
 test('seated outfit posing lasts 22 seconds and returns to normal idle', () => {
   const f = fixture(); f.behavior.showcase(); f.advance(21999); assert.equal(f.behavior.getState().activity,'showcase'); f.advance(1); assert.equal(f.behavior.getState().activity,'awake');
+});
+test('quiet companionship suppresses automatic requests while keeping sleep, wake and manual interactions', () => {
+  const f = fixture({ quietMode: true });
+  f.advance(TIMING.askAfterMs); assert.equal(f.behavior.getState().activity, 'awake');
+  f.advance(TIMING.idleAfterMs - TIMING.askAfterMs); assert.equal(f.behavior.getState().activity, 'drowsy');
+  f.advance(TIMING.drowsyMs); assert.equal(f.behavior.getState().activity, 'sleeping');
+  assert.equal(f.changes.some(s => s.activity === 'asking'), false);
+  f.behavior.wake(); f.advance(TIMING.wakingMs); assert.equal(f.behavior.getState().activity, 'awake');
+  f.behavior.requestPat(); assert.equal(f.behavior.getState().activity, 'asking');
+  f.advance(TIMING.requestMs); assert.equal(f.behavior.getState().activity, 'awake');
+});
+test('enabling quiet companionship cancels the pending request without postponing idle sleep', () => {
+  const f = fixture(); f.advance(60000); f.behavior.setQuietMode(true);
+  f.advance(TIMING.idleAfterMs - 60000); assert.equal(f.behavior.getState().activity, 'drowsy');
+  assert.equal(f.changes.some(s => s.activity === 'asking'), false);
+  f.advance(TIMING.drowsyMs); f.behavior.setQuietMode(false);
+  f.advance(TIMING.askAfterMs); assert.equal(f.behavior.getState().activity, 'sleeping');
+  assert.equal(f.timers.size, 0);
+});
+test('quiet switches preserve petting and happy animation clocks and resume automatic requests', () => {
+  const f = fixture(); f.behavior.petHead(); f.advance(2000);
+  const since = f.behavior.getState().activitySince;
+  f.behavior.setQuietMode(true); assert.equal(f.behavior.getState().activitySince, since);
+  f.advance(TIMING.pettingMs - 2000); assert.equal(f.behavior.getState().activity, 'happy');
+  f.behavior.setQuietMode(false);
+  f.advance(TIMING.happyMs); assert.equal(f.behavior.getState().activity, 'awake');
+  f.advance(TIMING.askAfterMs - TIMING.happyMs); assert.equal(f.behavior.getState().activity, 'asking');
+  f.behavior.dispose(); f.behavior.setQuietMode(true); assert.equal(f.timers.size, 0);
 });

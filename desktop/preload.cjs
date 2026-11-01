@@ -5,6 +5,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 const actions = new Set([
   'show-menu', 'toggle-visible', 'set-pose', 'set-size', 'toggle-always-on-top',
   'toggle-autostart', 'create-shortcut', 'check-updates', 'install-update', 'quit',
+  'toggle-quiet-mode', 'toggle-lock-position', 'reset-position',
   'pet-interact', 'pet-head', 'sleep', 'wake', 'request-pat', 'showcase', 'drag-begin', 'drag-move', 'drag-end'
 ]);
 
