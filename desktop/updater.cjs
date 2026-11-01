@@ -38,7 +38,7 @@ function createUpdater({
     enabled: Boolean(app?.isPackaged && platform === 'win32'),
     phase: 'idle',
     currentVersion: displayVersion(app?.getVersion?.()) || '0.0.0',
-    message: '会自动检查并下载更新，安装后可在菜单中选择重启。',
+    message: '已开启自动检查和下载；下载完成后可选择重启安装。',
   };
   let disposed = false;
   let inFlight = null;
@@ -144,7 +144,7 @@ function createUpdater({
       phase: 'downloaded',
       version: displayVersion(info?.version),
       percent: 100,
-      message: '新版本已下载；在菜单中选择“安装更新并重启”即可安装。',
+      message: '新版本已下载，点击“重启并安装”即可更新。',
     }));
     listen('update-not-available', () => publish({ phase: 'up-to-date', message: '当前已是最新版本。' }));
     listen('error', failure);

@@ -10,6 +10,7 @@ const api = window.desktopPet;
 const media = matchMedia('(prefers-reduced-motion: reduce)');
 let currentPose = 'sitting', activity = 'awake', currentKey = '', renderRequest = 0, noticeTimer, lastUpdate = '', down = null, dragFrame;
 let motion;
+let controls;
 const images = {
   sleeping: 'desktop-pet-sleeping.png', drowsy: 'desktop-pet-sleeping.png', waking: 'desktop-pet-waking.png',
   asking: 'desktop-pet-asking.png', petting: 'desktop-pet-happy.png', happy: 'desktop-pet-happy.png', showcase: 'desktop-pet-showcase.png'
@@ -25,6 +26,7 @@ try {
   motion.start();
 } catch { showNotice('当前使用简化待机效果。'); }
 async function applyStatus(status) {
+  controls?.update(status);
   currentPose = status.pose === 'standing' ? 'standing' : 'sitting';
   const behavior = status.behavior || { activity: 'awake', activitySince: Date.now() };
   activity = Object.hasOwn(phrases, behavior.activity) ? behavior.activity : 'awake';
@@ -82,6 +84,7 @@ surface.addEventListener('pointermove', event => {
 });
 surface.addEventListener('pointerup', event => finishPointer(event));
 surface.addEventListener('pointercancel', event => finishPointer(event,true));
+surface.addEventListener('contextmenu', event => {event.preventDefault();void action('show-menu');});
 surface.addEventListener('lostpointercapture', event => finishPointer(event,true));
 surface.addEventListener('keydown', event => { if(event.key==='Enter'||event.key===' '){event.preventDefault();void action(['sleeping','drowsy'].includes(activity)?'wake':'pet-head');} });
 window.addEventListener('blur', ()=>{if(down)finishPointer({pointerId:down.id},true);});
@@ -90,8 +93,10 @@ document.getElementById('pat').addEventListener('click', () => action('pet-head'
 document.getElementById('menu').addEventListener('click', () => action('show-menu'));
 install.addEventListener('click', () => action('install-update'));
 media.addEventListener('change', () => { motion?.setMode({reducedMotion: media.matches}); });
+controls = new DragonPetControls({action});
 if (api) {
   const unsubscribe = api.onStatus(applyStatus);
-  window.addEventListener('pagehide', () => {unsubscribe();motion?.destroy();}, { once: true });
+  const unsubscribeMenu = api.onMenu(request => controls.show(request?.tab));
+  window.addEventListener('pagehide', () => {unsubscribe();unsubscribeMenu();motion?.destroy();}, { once: true });
   api.getStatus().then(applyStatus).catch(() => showNotice('状态正在载入，可右键打开菜单。'));
 }

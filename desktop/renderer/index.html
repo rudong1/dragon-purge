@@ -18,11 +18,55 @@
       <button id="pat" type="button" title="摸摸头，看看她的尾巴">摸摸头</button>
       <button id="menu" type="button" title="大小、更新、快捷方式和退出">菜单 ···</button>
     </nav>
+    <button id="updates-toggle" class="updates-toggle" type="button" title="版本与自动更新" aria-label="打开版本与自动更新" aria-expanded="false">更新</button>
     <div id="notice" class="notice" role="status" hidden></div>
     <div id="speech" class="speech" role="status" hidden></div>
     <button id="install-update" class="install" type="button" hidden>重启更新</button>
+    <div id="menu-backdrop" class="menu-backdrop" hidden>
+      <section id="pet-menu" class="pet-menu" role="dialog" aria-modal="true" aria-labelledby="menu-title">
+        <header class="menu-header">
+          <span class="menu-mark" aria-hidden="true">✦</span>
+          <div><h1 id="menu-title">小白龙的口袋</h1><p id="menu-mood">陪你待机，也陪你玩</p></div>
+          <button id="menu-close" class="menu-close" type="button" aria-label="关闭菜单">×</button>
+        </header>
+        <nav class="menu-tabs" role="tablist" aria-label="菜单分类">
+          <button id="tab-actions" role="tab" data-tab="actions" aria-controls="panel-actions" aria-selected="true">动作</button>
+          <button id="tab-settings" role="tab" data-tab="settings" aria-controls="panel-settings" aria-selected="false" tabindex="-1">设置</button>
+          <button id="tab-updates" role="tab" data-tab="updates" aria-controls="panel-updates" aria-selected="false" tabindex="-1">更新</button>
+        </nav>
+        <div class="menu-content">
+          <section id="panel-actions" role="tabpanel" aria-labelledby="tab-actions">
+            <p class="group-label">今天想怎么陪你？</p>
+            <div class="menu-grid">
+              <button data-action="set-pose" data-value="sitting">坐着晃腿</button><button data-action="set-pose" data-value="standing">站起来</button>
+              <button data-action="sleep">抱尾巴打盹</button><button data-action="wake">叫醒她</button>
+              <button data-action="request-pat">求摸摸</button><button data-action="pet-head">摸摸头</button>
+            </div>
+            <button class="menu-feature" data-action="showcase"><span>换件新衣服</span><small>坐姿展示 · 今天的我好看吗？</small></button>
+          </section>
+          <section id="panel-settings" role="tabpanel" aria-labelledby="tab-settings" hidden>
+            <p class="group-label">桌宠大小</p>
+            <div class="size-options" aria-label="桌宠大小"><button data-action="set-size" data-value="small">小</button><button data-action="set-size" data-value="medium">中</button><button data-action="set-size" data-value="large">大</button></div>
+            <button id="setting-top" class="switch-row" data-action="toggle-always-on-top" role="switch" aria-checked="true"><span>留在最上面</span><i aria-hidden="true"></i></button>
+            <button id="setting-startup" class="switch-row" data-action="toggle-autostart" role="switch" aria-checked="false"><span>开机来找你</span><i aria-hidden="true"></i></button>
+            <button class="menu-row" data-action="create-shortcut">创建桌面快捷方式 <span aria-hidden="true">↗</span></button>
+          </section>
+          <section id="panel-updates" role="tabpanel" aria-labelledby="tab-updates" hidden>
+            <p class="group-label">版本与自动更新</p>
+            <div class="version-card"><span>当前版本</span><strong id="current-version">正在读取…</strong></div>
+            <p id="update-schedule" class="menu-description">正在读取自动更新状态…</p>
+            <p id="update-state" class="update-state" role="status">正在初始化…</p>
+            <progress id="update-progress" max="100" value="0" hidden aria-label="更新下载进度"></progress>
+            <div class="menu-grid"><button id="check-update" data-action="check-updates">立即检查更新</button><button id="panel-install" data-action="install-update" hidden>重启并安装</button></div>
+          </section>
+          <p id="menu-feedback" class="menu-feedback" role="status" hidden></p>
+        </div>
+        <footer class="menu-footer"><button data-action="toggle-visible" title="点击托盘图标可再次显示">隐藏桌宠</button><button data-action="quit" class="quit-button">退出桌宠</button></footer>
+      </section>
+    </div>
   </main>
   <script src="../../docs/desktop-pet-motion.js"></script>
+  <script src="pet-controls.js"></script>
   <script src="pet.js"></script>
 </body>
 </html>

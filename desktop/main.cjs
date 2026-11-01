@@ -185,7 +185,7 @@ function buildMenu() {
 function showContextMenu() {
   if (!window || window.isDestroyed()) return;
   behavior?.interact({ preserveActivity: true });
-  buildMenu().popup({ window });
+  window.webContents.send('desktop:show-menu', { tab: 'actions' });
 }
 
 function beginDrag() {

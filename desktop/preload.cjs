@@ -19,5 +19,11 @@ contextBridge.exposeInMainWorld('desktopPet', Object.freeze({
     const handler = (_event, status) => callback(status);
     ipcRenderer.on('desktop:status', handler);
     return () => ipcRenderer.removeListener('desktop:status', handler);
+  },
+  onMenu: callback => {
+    if (typeof callback !== 'function') throw new TypeError('A menu callback is required.');
+    const handler = (_event, request) => callback(request);
+    ipcRenderer.on('desktop:show-menu', handler);
+    return () => ipcRenderer.removeListener('desktop:show-menu', handler);
   }
 }));
